@@ -47,6 +47,7 @@ vector<event_t> schedule(vector<event_t> input) {
     event_t curr_e;
 
     while (e < ends.size()) {
+        std::cout << "LOOP: " << b << "," << e << std::endl;
         event_t beg = begs[b];
         event_t end = ends[e];
         if(beg.begin < end.end) {
