@@ -16,14 +16,13 @@ struct event_t {
     }
 };
 
-    std::ostream& operator<<(
-            std::ostream& os, // stream object
-            const struct event_t& foo
-        )
-        {
-            os << "{" << foo.begin << ","<< foo.end << ","<< foo.id << "}";
-            return os;
-        }
+std::ostream& operator<<(
+        std::ostream& os, // stream object
+        const struct event_t& foo
+        ) {
+    os << "{" << foo.begin << ","<< foo.end << ","<< foo.id << "}";
+    return os;
+}
 
 bool starts_before(event_t a, event_t b) {
     return a.begin < b.begin;
@@ -38,19 +37,20 @@ vector<event_t> schedule(vector<event_t> input) {
     vector<event_t> begs(input);
     sort(begs.begin(), begs.end(), starts_before);
     vector<event_t> ends(input);
-    sort(begs.begin(), begs.end(), ends_before);
+    sort(ends.begin(), ends.end(), ends_before);
 
     vector<event_t> res;
 
     set<int> currents;
     int b(0), e(0);
+    bool done_beg(false);
     event_t curr_e;
 
     while (e < ends.size()) {
-        std::cout << "LOOP: " << b << "," << e << std::endl;
         event_t beg = begs[b];
         event_t end = ends[e];
-        if(beg.begin < end.end) {
+        cout << "step: #beg " << beg <<  " #end " << end << endl;
+        if(!done_beg && beg.begin < end.end) {
             currents.insert(beg.id);
             if (currents.size() == 1) {
                 curr_e = beg; // this is now our only event.
@@ -62,6 +62,7 @@ vector<event_t> schedule(vector<event_t> input) {
             }
             b++;
             if (b == begs.size()) {
+                done_beg = true;
                 b--;
             }
         } else {
@@ -71,7 +72,7 @@ vector<event_t> schedule(vector<event_t> input) {
                 res.push_back(curr_e);
                 // Note, could be implemented with a heap, but too lazy.
                 if (currents.size() > 0) {
-                    set<int>::iterator new_id = max_element(currents.begin(), currents.end());
+                    set<int>::iterator new_id = min_element(currents.begin(), currents.end());
                     curr_e.id = *new_id;
                     curr_e.begin = end.end;
                 }
@@ -83,31 +84,27 @@ vector<event_t> schedule(vector<event_t> input) {
     return res;
 }
 
-void dumpv(vector<struct event_t> &vec) {
+void dumpv(vector<struct event_t> vec) {
     for (int i=0; i<vec.size();i++) {
         cout << vec[i];
         if (i < (vec.size()-1)) {
             cout << ",";
         }
     }
+    cout << endl;
 }
 
 int main() {
-    bool ok = true;
-
     {
-    struct event_t e1 = { 10, 20, 1 };
-    struct event_t arr[] = { e1 };
-    vector<struct event_t> v(arr, arr+ sizeof(arr)/sizeof(event_t));
-    vector<struct event_t> res = schedule(v);
+        vector<event_t> v = {{10, 20, 1}, {0, 30, 2}};
+        vector<event_t> res = schedule(v);
 
-    struct event_t e1_ref = { 10, 20, 1 };
-    struct event_t arr_ref[] = { e1_ref };
-    vector<struct event_t> v_ref(arr_ref, arr_ref + sizeof(arr_ref)/sizeof(event_t));
+        vector<event_t> v_ref = {{0, 10, 2}, {10, 20, 1}, {20, 30, 2}};
 
-    bool eq = v == v_ref;
-    ok &= eq;
-    std::cout << (eq ? "OK" : "KO") << " : expected " ; dumpv(v); std::cout << ", got " ; dumpv(v_ref) ; std::cout << std::endl;
+        cout << "expected: ";
+        dumpv(v_ref);
+        cout << "got: ";
+        dumpv(res);
     }
 
     return 0;
