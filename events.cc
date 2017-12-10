@@ -43,6 +43,7 @@ vector<event_t> schedule(vector<event_t> input) {
                     curr_e.begin = end.end;
                 }
             }
+            e++;
         }
     }
 
