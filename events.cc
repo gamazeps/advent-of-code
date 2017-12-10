@@ -109,19 +109,25 @@ bool all_eq(const vector<T>& a, const vector<T>& b) {
    return true; 
 }
 
+bool test_case(const vector<Event>& input, const vector<Event>& expected) {
+    vector<Event> res = schedule(input);
+    if (!all_eq(expected, res)) {
+        cout << "expected: ";
+        dumpv(expected);
+        cout << "got: ";
+        dumpv(res);
+        return false;
+    }
+    return true;
+}
+
 int main() {
     {
         vector<Event> v = {Event(10, 20, 1), Event(0, 30, 2)};
         vector<Event> res = schedule(v);
-
         vector<Event> v_ref = {Event(0, 10, 2), Event(10, 20, 1), Event(20, 30, 2)};
+        test_case(v, v_ref);
 
-        if (!all_eq(v_ref, res)) {
-            cout << "expected: ";
-            dumpv(v_ref);
-            cout << "got: ";
-            dumpv(res);
-        }
     }
 
     return 0;
