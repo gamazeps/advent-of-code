@@ -5,51 +5,53 @@
 
 using namespace std;
 
-struct event_t {
+class Event {
+  public:
     int begin;
     int end;
     int id; // lowest the better
 
-    friend std::ostream & operator<<(std::ostream &os, const struct event_t& p);
-    bool operator ==(const struct event_t &b) const {
-        return this->begin == b.begin && this->end == b.end && this->id == b.id;
+    Event(int begin, int end, int id) : begin(begin), end(end), id(id) {}
+    Event() : begin(0), end(0), id(0) {}
+
+    bool operator==(const Event& other) const {
+        return this->begin == other.begin && this->end == other.end && this->id == other.id;
     }
+
+    friend std::ostream & operator<<(std::ostream &os, const Event& p);
 };
 
-std::ostream& operator<<(
-        std::ostream& os, // stream object
-        const struct event_t& foo
-        ) {
-    os << "{" << foo.begin << ","<< foo.end << ","<< foo.id << "}";
+ostream& operator<<(ostream& os, const Event& p)  {  
+    os << "{" << p.begin << ","<< p.end << ","<< p.id << "}";
     return os;
-}
+}  
 
-bool starts_before(event_t a, event_t b) {
+
+bool starts_before(Event a, Event b) {
     return a.begin < b.begin;
 }
 
-bool ends_before(event_t a, event_t b) {
+bool ends_before(Event a, Event b) {
     return a.end < b.end;
 }
 
-vector<event_t> schedule(vector<event_t> input) {
+vector<Event> schedule(vector<Event> input) {
     // First generate the list of starts and ends
-    vector<event_t> begs(input);
+    vector<Event> begs(input);
     sort(begs.begin(), begs.end(), starts_before);
-    vector<event_t> ends(input);
+    vector<Event> ends(input);
     sort(ends.begin(), ends.end(), ends_before);
 
-    vector<event_t> res;
+    vector<Event> res;
 
     set<int> currents;
     int b(0), e(0);
     bool done_beg(false);
-    event_t curr_e;
+    Event curr_e;
 
     while (e < ends.size()) {
-        event_t beg = begs[b];
-        event_t end = ends[e];
-        cout << "step: #beg " << beg <<  " #end " << end << endl;
+        Event beg = begs[b];
+        Event end = ends[e];
         if(!done_beg && beg.begin < end.end) {
             currents.insert(beg.id);
             if (currents.size() == 1) {
@@ -84,27 +86,42 @@ vector<event_t> schedule(vector<event_t> input) {
     return res;
 }
 
-void dumpv(vector<struct event_t> vec) {
-    for (int i=0; i<vec.size();i++) {
-        cout << vec[i];
-        if (i < (vec.size()-1)) {
-            cout << ",";
-        }
+template <class T>
+void dumpv(const vector<T>& vec) {
+    for (const T& e : vec) {
+        cout << e << " ";
     }
     cout << endl;
 }
 
+template <class T>
+bool all_eq(const vector<T>& a, const vector<T>& b) {
+    if (a.size() != b.size()) {
+        return false;
+    }
+
+    for (int i(0); i<a.size(); i++) {
+       if (!(a[i] == b[i])) {
+          return false;
+       }
+    }
+
+   return true; 
+}
+
 int main() {
     {
-        vector<event_t> v = {{10, 20, 1}, {0, 30, 2}};
-        vector<event_t> res = schedule(v);
+        vector<Event> v = {Event(10, 20, 1), Event(0, 30, 2)};
+        vector<Event> res = schedule(v);
 
-        vector<event_t> v_ref = {{0, 10, 2}, {10, 20, 1}, {20, 30, 2}};
+        vector<Event> v_ref = {Event(0, 10, 2), Event(10, 20, 1), Event(20, 30, 2)};
 
-        cout << "expected: ";
-        dumpv(v_ref);
-        cout << "got: ";
-        dumpv(res);
+        if (!all_eq(v_ref, res)) {
+            cout << "expected: ";
+            dumpv(v_ref);
+            cout << "got: ";
+            dumpv(res);
+        }
     }
 
     return 0;
