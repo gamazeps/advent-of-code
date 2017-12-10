@@ -45,6 +45,9 @@ vector<event_t> schedule(vector<event_t> input) {
                 curr_e = beg; // The end is false but we will change it.
             }
             b++;
+            if (b == begs.size()) {
+                b--;
+            }
         } else {
             currents.erase(end.id);
             if (curr_e.id == end.id) {
