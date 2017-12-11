@@ -47,12 +47,7 @@ def part_1(insts):
         if cond(regs, inst):
             apply_op(regs, inst)
 
-    max_v = 0 # bad, should use None or other..
-    for k in regs:
-        if regs[k] > max_v:
-            max_v = regs[k]
-
-    return max_v
+    return max(regs.values())
 
 def part_2(insts):
     regs = collections.defaultdict(int)
@@ -61,8 +56,7 @@ def part_2(insts):
     for inst in insts:
         if cond(regs, inst):
             apply_op(regs, inst)
-        if regs[inst["register"]] > highest:
-            highest = regs[inst["register"]]
+        highest = max(highest, regs[inst["register"]])
 
     return highest
 
