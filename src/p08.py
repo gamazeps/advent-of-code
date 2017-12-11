@@ -9,7 +9,7 @@ operations = {
         "<=" : lambda x, y: x <= y,
         ">=" : lambda x, y: x >= y,
         "==" : lambda x, y: x == y,
-        "!=" : lambda x, y: x == y,
+        "!=" : lambda x, y: x != y,
         }
 
 def parse_input(fname):
@@ -42,12 +42,10 @@ def apply_op(regs, inst):
 
 def part_1(insts):
     regs = collections.defaultdict(int)
-    print(regs)
 
     for inst in insts:
         if cond(regs, inst):
             apply_op(regs, inst)
-        print(regs)
 
     max_v = 0 # bad, should use None or other..
     for k in regs:
@@ -56,9 +54,22 @@ def part_1(insts):
 
     return max_v
 
+def part_2(insts):
+    regs = collections.defaultdict(int)
+    highest = 0
+
+    for inst in insts:
+        if cond(regs, inst):
+            apply_op(regs, inst)
+        if regs[inst["register"]] > highest:
+            highest = regs[inst["register"]]
+
+    return highest
+
 def main():
-    insts = parse_input("data/p08.test")
+    insts = parse_input("data/p08.in")
     print(part_1(insts))
+    print(part_2(insts))
 
 if __name__ == "__main__":
     main()
